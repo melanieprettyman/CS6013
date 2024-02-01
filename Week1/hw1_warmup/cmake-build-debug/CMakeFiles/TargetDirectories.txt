@@ -1,0 +1,3 @@
+/Users/melanieprettyman/Desktop/MSD/CS6013/CS6013/Week1/hw1_warmup/cmake-build-debug/CMakeFiles/hw1_warmup.dir
+/Users/melanieprettyman/Desktop/MSD/CS6013/CS6013/Week1/hw1_warmup/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/melanieprettyman/Desktop/MSD/CS6013/CS6013/Week1/hw1_warmup/cmake-build-debug/CMakeFiles/rebuild_cache.dir
