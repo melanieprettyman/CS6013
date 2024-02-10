@@ -13,6 +13,8 @@
 
 using namespace std;
 
+void closeCommandFileDescriptors(Command& command);
+
 ////////////////////////////////////////////////////////////////////////
 // Example test commands you can try once your shell is up and running:
 //
@@ -185,9 +187,13 @@ vector<Command> getCommands( const vector<string> & tokens )
          if( tokens[j] == ">" || tokens[j] == "<" ) {
              // Handle I/O redirection tokens
              if(tokens[j] == ">"){
+                 //check if command is the last command
+                 // output redirection should happen only on the last command
                  if(cmdNumber == commands.size() -1 ){
-                     if(j + 1 < tokens.size()){
+                     if(j + 1 < tokens.size()){ //if the file name exists
+                         //set the outputFD to open the file for writing or creates the file if it doesn't exist
                          command.outputFd = open(tokens[j + 1].c_str(), O_WRONLY | O_CREAT , 0666);
+                         //handle if the file fails to open
                          if(command.outputFd == -1){
                              perror("error opening output file");
                              error = true;
@@ -196,24 +202,25 @@ vector<Command> getCommands( const vector<string> & tokens )
                  }
              }
              if(tokens[j] == "<"){
+                 // input redirection should happen only on the last command
                  if(cmdNumber == commands.size() -1 ){
-                     if(j + 1 < tokens.size()){
+                     if(j + 1 < tokens.size()){ //if the file name exists
+                         //set the inputFD to open the file for reading only (std::in)
                          command.inputFd = open(tokens[j + 1].c_str(), O_RDONLY , 0666);
+                         //handle if the file fails to open
                          if(command.inputFd == -1){
                              perror("error opening input file");
                              error = true;
                          }
                      }
-                     //TODO errors if file doesn't exist?
                  }
              }
 
              j++;//hits the NULL in the vector , does not add file,  skip filename
          }
-
+        //Is this a background program
          else if( tokens[j] == "&" ){
-            // Fill this in if you choose to do the optional "background command" part.
-            assert(false);
+            command.background = true;
          }
 
          else {
@@ -227,7 +234,6 @@ vector<Command> getCommands( const vector<string> & tokens )
         // connect the commands using the pipe created
          if( cmdNumber > 0 ){
              //CREATE PIPE
-             //Must create the file descriptors before the for so that both parent and child will have access to them.
              int fds[2]; //File descriptor (location in table of file)
              int rc = pipe(fds); //Create pipe
              int readFD = fds[0];
@@ -260,30 +266,35 @@ vector<Command> getCommands( const vector<string> & tokens )
    } // end for( cmdNumber = 0 to commands.size )
 
    if( error ){
+       // Close any file descriptors  opened in this function and
+       // free the memory allocated for the arguments of the commands
 
-      // Close any file descriptors you opened in this function and return the appropriate data!
+       for (Command& command : commands) {
+           for (const char *arg : command.argv) {
+               if (arg)
+                   free((void *) arg);
 
-      // Note, an error can happen while parsing any command. However, the "commands" vector is
-      // pre-populated with a set of "empty" commands and filled in as we go.  Because
-      // of this, a "command" name can be blank (the default for a command struct that has not
-      // yet been filled in).  (Note, it has not been filled in yet because the processing
-      // has not gotten to it when the error (in a previous command) occurred.
-       for (auto &command : commands){
-           for (auto arg : command.argv){
-               if(arg) free(const_cast<char*>(arg));
            }
-           if(command.inputFd != STDIN_FILENO) close(command.inputFd);
-           if(command.outputFd != STDOUT_FILENO) close(command.outputFd);
+           command.argv.clear(); //clear the vector
+
+           closeCommandFileDescriptors(command);
        }
-
-       commands.clear();
+       commands.clear(); // Clear the list of commands after cleanup
    }
-
 
    return commands;
 
-} // end getCommands()
+}
 
+//Function closes the command's input and output file descriptors if they're not using the standard file descriptors
+void closeCommandFileDescriptors(Command& command) {
+    if (command.inputFd != STDIN_FILENO) {
+        close(command.inputFd);
+    }
+    if (command.outputFd != STDOUT_FILENO) {
+        close(command.outputFd);
+    }
+}
 
 
 
