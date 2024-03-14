@@ -1,3 +1,16 @@
+/////////////////////////////////////////////////////////////////////////////////////
+// Melanie Prettyman
+// CS 6013
+// Spring 2024
+//
+// About Project:
+// This project is a custom memory allocator that uses mmap to allocate memory and
+// a hash table to keep track of the allocated memory regions.
+//
+// About file:
+// This file contains the main function and test routines for the MyMalloc project.
+//////////////////////////////////////////////////////////////////////////////////////
+
 #include "MyMalloc.h"
 #include <iostream>
 #include <vector>
