@@ -185,7 +185,7 @@ vector<Command> getCommands( const vector<string> & tokens )
 
          //I/O CALL
          if( tokens[j] == ">" || tokens[j] == "<" ) {
-             // Handle I/O redirection tokens
+             //Write to
              if(tokens[j] == ">"){
                  //check if command is the last command
                  // output redirection should happen only on the last command
@@ -201,6 +201,7 @@ vector<Command> getCommands( const vector<string> & tokens )
                      }
                  }
              }
+             //Read to
              if(tokens[j] == "<"){
                  // input redirection should happen only on the last command
                  if(cmdNumber == commands.size() -1 ){
@@ -234,7 +235,7 @@ vector<Command> getCommands( const vector<string> & tokens )
         // connect the commands using the pipe created
          if( cmdNumber > 0 ){
              //CREATE PIPE
-             int fds[2]; //File descriptor (location in table of file)
+             int fds[2]; //File descriptor
              int rc = pipe(fds); //Create pipe
              int readFD = fds[0];
              int writeFD = fds[1];
@@ -244,10 +245,11 @@ vector<Command> getCommands( const vector<string> & tokens )
                  perror("Pipe failed");
                  exit(1);
              }
-             // cmdNumber is the command after the pipe
+
+             // (cmdNumber -1) is the command before the pipe
                 //set the commands output to write what it read in from the pipe
              commands[cmdNumber -1].outputFd = writeFD;
-             // cmdNumber is the command before the pipe
+             // cmdNumber is the command after the pipe
                 //set the commands input to read into the pipe
              commands[cmdNumber].inputFd = readFD;
 
