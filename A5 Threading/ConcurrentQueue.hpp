@@ -41,7 +41,7 @@ public:
             tail_ = newNode;
 
             //Check if the queue is empty, init head to point to the new node
-            if(size_ == 0){
+            if(tail_ == head_){
                 head_->next = newNode;
             }
 
@@ -60,8 +60,7 @@ public:
             std::unique_lock<std::mutex> lock(mutex_);
 
             //If the queue is empty, return false
-            if (size_ == 0) {
-                //todo unlock the mutex
+            if (tail_ == head_) {
                 return false;
             }
 
