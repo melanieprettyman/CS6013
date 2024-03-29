@@ -1,0 +1,5 @@
+# ninja log v5
+4	293	1711390784933847698	CMakeFiles/A5_Threading.dir/main.cpp.o	a2bcc90093d296fd
+0	37	1711727207862575612	build.ninja	584459ce848d12a0
+213	245	1711584282384771403	A5_Threading	f2ba41c3900629df
+4	213	1711584282351725081	CMakeFiles/A5_Threading.dir/SerialQueueTests.cpp.o	ac67cccfeb3b67b2
